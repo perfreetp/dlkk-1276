@@ -1,0 +1,60 @@
+@use '@/styles/variables.scss' as *;
+
+.progressWrapper {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.progressBar {
+  flex: 1;
+  background: $color-bg-hover;
+  border-radius: $radius-round;
+  overflow: hidden;
+}
+
+.height-sm {
+  height: 8rpx;
+}
+
+.height-md {
+  height: 12rpx;
+}
+
+.height-lg {
+  height: 16rpx;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: $radius-round;
+  transition: width $transition-base ease;
+}
+
+.color-primary {
+  background: linear-gradient(90deg, $color-primary 0%, $color-primary-light 100%);
+}
+
+.color-success {
+  background: linear-gradient(90deg, $color-success 0%, $color-accent 100%);
+}
+
+.color-warning {
+  background: linear-gradient(90deg, $color-warning 0%, #FBBF24 100%);
+}
+
+.color-error {
+  background: linear-gradient(90deg, $color-error 0%, #F87171 100%);
+}
+
+.color-secondary {
+  background: linear-gradient(90deg, $color-secondary 0%, $color-secondary-light 100%);
+}
+
+.progressLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  min-width: 80rpx;
+  text-align: right;
+  font-weight: $font-weight-medium;
+}

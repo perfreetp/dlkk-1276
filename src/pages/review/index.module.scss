@@ -1,0 +1,364 @@
+@use '@/styles/variables.scss' as *;
+
+.pageContainer {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 120rpx;
+}
+
+.pageHeader {
+  background: linear-gradient(135deg, $color-secondary 0%, $color-primary 100%);
+  padding: $spacing-xl $page-padding;
+  padding-top: 40rpx;
+  color: $color-text-white;
+}
+
+.headerTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  margin-bottom: 8rpx;
+}
+
+.headerSubtitle {
+  font-size: $font-size-sm;
+  opacity: 0.9;
+}
+
+.headerStats {
+  display: flex;
+  gap: $spacing-lg;
+  margin-top: $spacing-lg;
+}
+
+.headerStat {
+  .statValue {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    line-height: 1.2;
+  }
+
+  .statLabel {
+    font-size: $font-size-xs;
+    opacity: 0.85;
+    margin-top: 4rpx;
+  }
+}
+
+.actionsBar {
+  display: flex;
+  padding: $spacing-md $page-padding;
+  gap: $spacing-sm;
+  background: $color-bg-card;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.actionBtn {
+  @include button-reset;
+  flex: 1;
+  height: 72rpx;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  background: $color-bg-hover;
+  color: $color-text-secondary;
+
+  &.primary {
+    background: $color-primary;
+    color: $color-text-white;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.filterTabs {
+  display: flex;
+  padding: $spacing-sm $page-padding;
+  background: $color-bg-card;
+  gap: $spacing-sm;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.filterTab {
+  @include button-reset;
+  padding: 0 $spacing-md;
+  height: 64rpx;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  background: transparent;
+
+  &.active {
+    background: $color-primary-bg;
+    color: $color-primary;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.reviewList {
+  padding: $spacing-md $page-padding;
+}
+
+.reviewCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  transition: all $transition-base ease;
+
+  &:active {
+    transform: scale(0.99);
+    box-shadow: $shadow-card-hover;
+  }
+}
+
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-md;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.weekBadge {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.weekNumber {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+.weekLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-medium;
+}
+
+.weekDate {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.reviewStatus {
+  font-size: $font-size-xs;
+  padding: 6rpx 16rpx;
+  border-radius: $radius-sm;
+  font-weight: $font-weight-medium;
+
+  &.completed {
+    color: $color-success;
+    background: $color-accent-bg;
+  }
+
+  &.draft {
+    color: $color-text-tertiary;
+    background: $color-bg-hover;
+  }
+}
+
+.reviewSummary {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  line-height: $line-height-normal;
+  margin-bottom: $spacing-md;
+  @include text-ellipsis-multi(3);
+}
+
+.highlightsSection {
+  margin-bottom: $spacing-md;
+}
+
+.highlightsTitle {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  margin-bottom: $spacing-sm;
+}
+
+.highlightsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+}
+
+.highlightTag {
+  font-size: $font-size-xs;
+  color: $color-accent;
+  background: $color-accent-bg;
+  padding: 6rpx 16rpx;
+  border-radius: $radius-sm;
+  font-weight: $font-medium;
+}
+
+.goalProgressSection {
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.goalProgressTitle {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  margin-bottom: $spacing-sm;
+}
+
+.goalProgressItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-xs 0;
+
+  &:not(:last-child) {
+    border-bottom: 1rpx solid $color-divider;
+  }
+}
+
+.goalName {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.goalProgressValue {
+  font-size: $font-size-sm;
+  font-weight: $font-semibold;
+  color: $color-primary;
+  min-width: 80rpx;
+  text-align: right;
+}
+
+.reviewFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.footerActions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.footerBtn {
+  @include button-reset;
+  padding: 0 $spacing-md;
+  height: 56rpx;
+  border-radius: $radius-button;
+  font-size: $font-size-xs;
+  background: $color-bg-hover;
+  color: $color-text-secondary;
+
+  &.primary {
+    background: $color-primary-bg;
+    color: $color-primary;
+    font-weight: $font-medium;
+  }
+}
+
+.emptyState {
+  text-align: center;
+  padding: $spacing-xl * 3 $page-padding;
+}
+
+.emptyIcon {
+  font-size: 120rpx;
+  margin-bottom: $spacing-md;
+}
+
+.emptyTitle {
+  font-size: $font-size-lg;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.emptyDesc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-lg;
+  line-height: $line-height-normal;
+}
+
+.createBtn {
+  @include button-reset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 80rpx;
+  padding: 0 $spacing-xl;
+  border-radius: $radius-button;
+  background: $color-primary;
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+}
+
+.fabButton {
+  @include button-reset;
+  position: fixed;
+  right: 32rpx;
+  bottom: 180rpx;
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $color-secondary 0%, $color-primary 100%);
+  color: $color-text-white;
+  font-size: 48rpx;
+  box-shadow: 0 8rpx 24rpx rgba(123, 104, 238, 0.4);
+  z-index: 100;
+
+  &:active {
+    transform: scale(0.9);
+  }
+}
+
+.templateSection {
+  padding: $spacing-md $page-padding;
+  background: $color-bg-card;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.templateList {
+  display: flex;
+  gap: $spacing-sm;
+  overflow-x: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.templateItem {
+  @include scroll-x-item(240rpx);
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  flex-shrink: 0;
+
+  .templateName {
+    font-size: $font-size-sm;
+    font-weight: $font-medium;
+    color: $color-text-primary;
+    margin-bottom: 4rpx;
+  }
+
+  .templateDesc {
+    font-size: $font-size-xs;
+    color: $color-text-tertiary;
+    line-height: $line-height-tight;
+  }
+}

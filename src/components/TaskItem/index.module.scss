@@ -1,0 +1,174 @@
+@use '@/styles/variables.scss' as *;
+
+.taskItem {
+  display: flex;
+  align-items: flex-start;
+  padding: $spacing-md;
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  margin-bottom: $spacing-sm;
+  box-shadow: 0 1rpx 8rpx rgba(0, 0, 0, 0.04);
+  transition: all $transition-base ease;
+
+  &.completed {
+    opacity: 0.7;
+
+    .taskTitle {
+      text-decoration: line-through;
+      color: $color-text-tertiary;
+    }
+  }
+
+  &.delayed {
+    border-left: 6rpx solid $color-warning;
+  }
+
+  &.temporary {
+    background: linear-gradient(90deg, rgba(123, 104, 238, 0.05) 0%, $color-bg-card 30%);
+  }
+}
+
+.checkboxWrap {
+  padding-top: 4rpx;
+  margin-right: $spacing-md;
+}
+
+.checkbox {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  border: 3rpx solid $color-border;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-fast ease;
+
+  &.checked {
+    background: $color-primary;
+    border-color: $color-primary;
+  }
+}
+
+.checkIcon {
+  color: $color-text-white;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+}
+
+.taskContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.taskTitle {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-tight;
+  margin-bottom: 6rpx;
+  @include text-ellipsis;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.tempTag {
+  font-size: $font-size-xs;
+  color: $color-secondary;
+  background: $color-secondary-bg;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+  font-weight: $font-weight-medium;
+}
+
+.goalName {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-bottom: 8rpx;
+  @include text-ellipsis;
+}
+
+.taskMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.priorityDot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+
+  &.priority-high {
+    background: $color-error;
+  }
+
+  &.priority-medium {
+    background: $color-warning;
+  }
+
+  &.priority-low {
+    background: $color-success;
+  }
+}
+
+.metaText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.delayReason {
+  margin-top: $spacing-xs;
+  padding: $spacing-xs $spacing-sm;
+  background: rgba(245, 158, 11, 0.08);
+  border-radius: $radius-xs;
+}
+
+.delayLabel {
+  font-size: $font-size-xs;
+  color: $color-warning;
+  font-weight: $font-weight-medium;
+}
+
+.delayText {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.taskActions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  margin-left: $spacing-sm;
+}
+
+.actionBtn {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-fast ease;
+
+  &:active {
+    transform: scale(0.9);
+  }
+}
+
+.pomodoroBtn {
+  background: $pomodoro-bg;
+}
+
+.pomodoroIcon {
+  font-size: 28rpx;
+}
+
+.delayBtn {
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.delayIcon {
+  font-size: 24rpx;
+}

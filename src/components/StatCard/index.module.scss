@@ -1,0 +1,96 @@
+@use '@/styles/variables.scss' as *;
+
+.statCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md $spacing-lg;
+  box-shadow: $shadow-card;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+
+  &.color-primary {
+    .cardIcon { background: $color-primary-bg; }
+    .valueText { color: $color-primary; }
+  }
+
+  &.color-success {
+    .cardIcon { background: $color-accent-bg; }
+    .valueText { color: $color-success; }
+  }
+
+  &.color-warning {
+    .cardIcon { background: rgba(245, 158, 11, 0.1); }
+    .valueText { color: $color-warning; }
+  }
+
+  &.color-secondary {
+    .cardIcon { background: $color-secondary-bg; }
+    .valueText { color: $color-secondary; }
+  }
+
+  &.color-accent {
+    .cardIcon { background: $color-accent-bg; }
+    .valueText { color: $color-accent; }
+  }
+}
+
+.cardIcon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.iconText {
+  font-size: 36rpx;
+}
+
+.cardContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.cardTitle {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: 4rpx;
+}
+
+.cardValue {
+  display: flex;
+  align-items: baseline;
+  gap: $spacing-xs;
+}
+
+.valueText {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  line-height: 1.2;
+}
+
+.trendTag {
+  font-size: $font-size-xs;
+  padding: 4rpx 10rpx;
+  border-radius: $radius-xs;
+  font-weight: $font-weight-medium;
+}
+
+.trendUp {
+  color: $color-success;
+  background: $color-accent-bg;
+}
+
+.trendDown {
+  color: $color-error;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.cardSubtitle {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}

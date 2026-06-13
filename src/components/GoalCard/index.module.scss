@@ -1,0 +1,138 @@
+@use '@/styles/variables.scss' as *;
+
+.goalCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  transition: all $transition-base ease;
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: $shadow-card-hover;
+  }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.categoryTag {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  background: $color-primary-bg;
+  padding: 6rpx 16rpx;
+  border-radius: $radius-sm;
+  font-weight: $font-weight-medium;
+}
+
+.priorityTag {
+  font-size: $font-size-xs;
+  padding: 6rpx 16rpx;
+  border-radius: $radius-sm;
+  font-weight: $font-weight-medium;
+}
+
+.priority-high {
+  color: $color-error;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.priority-medium {
+  color: $color-warning;
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.priority-low {
+  color: $color-success;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.goalTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  line-height: $line-height-tight;
+  margin-bottom: $spacing-xs;
+  @include text-ellipsis;
+}
+
+.goalMetric {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  margin-bottom: $spacing-lg;
+  @include text-ellipsis-multi(2);
+}
+
+.progressSection {
+  margin-bottom: $spacing-lg;
+}
+
+.progressInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+}
+
+.progressText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.progressValue {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.footerItem {
+  flex: 1;
+  text-align: center;
+}
+
+.footerDivider {
+  width: 1rpx;
+  height: 48rpx;
+  background: $color-divider;
+}
+
+.footerLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-bottom: 4rpx;
+}
+
+.footerValue {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+
+  &.danger {
+    color: $color-error;
+  }
+
+  &.status-active {
+    color: $color-primary;
+  }
+
+  &.status-completed {
+    color: $color-success;
+  }
+
+  &.status-archived {
+    color: $color-text-tertiary;
+  }
+}

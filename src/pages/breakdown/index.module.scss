@@ -1,0 +1,393 @@
+@use '@/styles/variables.scss' as *;
+
+.pageContainer {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 120rpx;
+}
+
+.goalSelector {
+  padding: $spacing-md $page-padding;
+  background: $color-bg-card;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.goalSelectTab {
+  display: flex;
+  gap: $spacing-sm;
+  overflow-x: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.goalTab {
+  @include button-reset;
+  flex-shrink: 0;
+  padding: 0 $spacing-md;
+  height: 64rpx;
+  border-radius: $radius-button;
+  background: $color-bg-page;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  transition: all $transition-fast ease;
+
+  &.active {
+    background: $color-primary;
+    color: $color-text-white;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.sectionTabs {
+  display: flex;
+  padding: $spacing-sm $page-padding;
+  background: $color-bg-card;
+  gap: $spacing-md;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.sectionTab {
+  @include button-reset;
+  flex: 1;
+  height: 72rpx;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  background: transparent;
+  transition: all $transition-fast ease;
+
+  &.active {
+    background: $color-primary-bg;
+    color: $color-primary;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.contentArea {
+  padding: $spacing-lg $page-padding;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.sectionTip {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.stagesList {
+  .stageCard:not(:last-child) {
+    margin-bottom: $spacing-md;
+  }
+}
+
+.stageCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  position: relative;
+  overflow: hidden;
+
+  &.completed {
+    .stageIndex {
+      background: $color-success;
+    }
+  }
+
+  &.in-progress {
+    .stageIndex {
+      background: $color-primary;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 6rpx;
+      background: $color-primary;
+    }
+  }
+
+  &.pending {
+    .stageIndex {
+      background: $color-border;
+      color: $color-text-tertiary;
+    }
+  }
+}
+
+.stageHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-sm;
+}
+
+.stageIndex {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: $radius-md;
+  background: $color-primary;
+  color: $color-text-white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: $font-weight-bold;
+  font-size: $font-size-md;
+  flex-shrink: 0;
+}
+
+.stageInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.stageTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+  @include text-ellipsis;
+}
+
+.stageDeadline {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.stageStatus {
+  font-size: $font-size-xs;
+  padding: 6rpx 16rpx;
+  border-radius: $radius-sm;
+  font-weight: $font-weight-medium;
+  flex-shrink: 0;
+
+  &.status-completed {
+    color: $color-success;
+    background: $color-accent-bg;
+  }
+
+  &.status-in-progress {
+    color: $color-primary;
+    background: $color-primary-bg;
+  }
+
+  &.status-pending {
+    color: $color-text-tertiary;
+    background: $color-bg-hover;
+  }
+}
+
+.stageDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  margin-bottom: $spacing-md;
+}
+
+.stageProgress {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.progressText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  min-width: 100rpx;
+}
+
+.milestonesList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.milestoneItem {
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  box-shadow: 0 1rpx 8rpx rgba(0, 0, 0, 0.04);
+
+  &.current {
+    background: linear-gradient(135deg, $color-primary-bg 0%, $color-secondary-bg 100%);
+    border: 2rpx solid $color-primary;
+  }
+}
+
+.weekBadge {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-md;
+  background: $color-bg-hover;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  .weekNum {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+    line-height: 1;
+  }
+
+  .weekLabel {
+    font-size: $font-size-xs;
+    color: $color-text-tertiary;
+    margin-top: 4rpx;
+  }
+
+  &.completed {
+    background: $color-accent-bg;
+
+    .weekNum, .weekLabel {
+      color: $color-success;
+    }
+  }
+
+  &.current {
+    background: $color-primary;
+
+    .weekNum, .weekLabel {
+      color: $color-text-white;
+    }
+  }
+}
+
+.milestoneContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.milestoneTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+  @include text-ellipsis;
+}
+
+.milestoneDesc {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  @include text-ellipsis;
+}
+
+.milestoneStatusIcon {
+  font-size: 32rpx;
+}
+
+.dailyList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.dayGroup {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.dayHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1rpx solid $color-divider;
+  margin-bottom: $spacing-sm;
+}
+
+.dayDate {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.dayCount {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.dailyTask {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm 0;
+
+  &:not(:last-child) {
+    border-bottom: 1rpx solid $color-divider;
+  }
+}
+
+.taskCheckbox {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  border: 3rpx solid $color-border;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.checked {
+    background: $color-success;
+    border-color: $color-success;
+    color: $color-text-white;
+    font-size: 20rpx;
+  }
+}
+
+.taskTitle {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  @include text-ellipsis;
+
+  &.completed {
+    text-decoration: line-through;
+    color: $color-text-tertiary;
+  }
+}
+
+.taskPomodoro {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  flex-shrink: 0;
+}
+
+.emptyState {
+  text-align: center;
+  padding: $spacing-xl * 3 0;
+}
+
+.emptyIcon {
+  font-size: 100rpx;
+  margin-bottom: $spacing-md;
+}
+
+.emptyText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}

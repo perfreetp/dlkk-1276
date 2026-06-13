@@ -1,0 +1,217 @@
+@use '@/styles/variables.scss' as *;
+
+.pageContainer {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 120rpx;
+}
+
+.pageHeader {
+  background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
+  padding: $spacing-xl $page-padding;
+  padding-top: 40rpx;
+  color: $color-text-white;
+}
+
+.headerTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+}
+
+.greeting {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+}
+
+.headerActions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.headerBtn {
+  @include button-reset;
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: $color-text-white;
+  font-size: 32rpx;
+}
+
+.quickStats {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.quickStat {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  text-align: center;
+}
+
+.quickStatValue {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  line-height: 1.2;
+}
+
+.quickStatLabel {
+  font-size: $font-size-xs;
+  opacity: 0.9;
+  margin-top: 4rpx;
+}
+
+.filterSection {
+  padding: $spacing-lg $page-padding;
+  padding-bottom: $spacing-md;
+}
+
+.filterTabs {
+  display: flex;
+  gap: $spacing-sm;
+  background: $color-bg-card;
+  padding: 8rpx;
+  border-radius: $radius-button;
+  box-shadow: $shadow-card;
+}
+
+.filterTab {
+  flex: 1;
+  @include button-reset;
+  height: 68rpx;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  transition: all $transition-fast ease;
+
+  &.active {
+    background: $color-primary;
+    color: $color-text-white;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.goalsList {
+  padding: 0 $page-padding;
+  padding-bottom: $spacing-lg;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+  margin-top: $spacing-lg;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.sectionAction {
+  font-size: $font-size-sm;
+  color: $color-primary;
+}
+
+.emptyState {
+  text-align: center;
+  padding: $spacing-xl * 2 $page-padding;
+}
+
+.emptyIcon {
+  font-size: 120rpx;
+  margin-bottom: $spacing-md;
+}
+
+.emptyTitle {
+  font-size: $font-size-lg;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.emptyDesc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-lg;
+}
+
+.createBtn {
+  @include button-reset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 80rpx;
+  padding: 0 $spacing-xl;
+  border-radius: $radius-button;
+  background: $color-primary;
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+}
+
+.templatesSection {
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-lg;
+}
+
+.templatesGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-md;
+}
+
+.templateCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  transition: all $transition-base ease;
+
+  &:active {
+    transform: scale(0.97);
+    box-shadow: $shadow-card-hover;
+  }
+}
+
+.templateIcon {
+  font-size: 48rpx;
+  margin-bottom: $spacing-sm;
+}
+
+.templateTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 6rpx;
+}
+
+.templateDesc {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  line-height: $line-height-tight;
+}
+
+.fabButton {
+  @include button-reset;
+  position: fixed;
+  right: 32rpx;
+  bottom: 180rpx;
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
+  color: $color-text-white;
+  font-size: 48rpx;
+  box-shadow: 0 8rpx 24rpx rgba(91, 141, 239, 0.4);
+  z-index: 100;
+
+  &:active {
+    transform: scale(0.9);
+  }
+}
