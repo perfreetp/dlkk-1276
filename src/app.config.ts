@@ -4,7 +4,10 @@ export default defineAppConfig({
     'pages/breakdown/index',
     'pages/today/index',
     'pages/review/index',
-    'pages/stats/index'
+    'pages/stats/index',
+    'pages/create-goal/index',
+    'pages/goal-detail/index',
+    'pages/create-review/index'
   ],
   window: {
     backgroundTextStyle: 'light',

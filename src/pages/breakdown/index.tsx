@@ -1,55 +1,141 @@
-import React, { useState } from 'react'
-import { View, Text, Button, ScrollView } from '@tarojs/components'
-import Taro from '@tarojs/taro'
+import React, { useState, useMemo } from 'react'
+import { View, Text, Button, ScrollView, Input, Textarea, Picker } from '@tarojs/components'
+import Taro, { useDidShow } from '@tarojs/taro'
 import styles from './index.module.scss'
 import classnames from 'classnames'
-import { mockGoals, mockDailyActions } from '@/data/mockData'
-import type { Goal, StageTask, WeeklyMilestone, DailyAction } from '@/types/goal'
+import { useGoalContext } from '@/store/GoalContext'
+import type { Goal, StageTask, WeeklyMilestone, DailyAction, Priority } from '@/types/goal'
 import ProgressBar from '@/components/ProgressBar'
 import { getToday } from '@/utils/dateUtil'
 
 type ViewType = 'stages' | 'milestones' | 'daily'
 
+const priorities: { value: Priority; label: string }[] = [
+  { value: 'high', label: '高' },
+  { value: 'medium', label: '中' },
+  { value: 'low', label: '低' }
+]
+
 const BreakdownPage: React.FC = () => {
-  const [selectedGoalId, setSelectedGoalId] = useState<string>(mockGoals[0].id)
+  const { goals, dailyActions, refreshData, addStageTask, updateStageTask, addWeeklyMilestone, updateWeeklyMilestone, addDailyAction, toggleDailyAction } = useGoalContext()
+
+  const activeGoals = useMemo(() => goals.filter(g => g.status === 'active'), [goals])
+  const [selectedGoalId, setSelectedGoalId] = useState<string>(activeGoals[0]?.id || '')
   const [viewType, setViewType] = useState<ViewType>('stages')
-  const [dailyActions, setDailyActions] = useState<DailyAction[]>(mockDailyActions)
 
-  const selectedGoal = mockGoals.find(g => g.id === selectedGoalId)
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [addType, setAddType] = useState<'stage' | 'milestone' | 'daily'>('stage')
 
-  const activeGoals = mockGoals.filter(g => g.status === 'active')
+  const [stageTitle, setStageTitle] = useState('')
+  const [stageDesc, setStageDesc] = useState('')
+  const [stageDeadline, setStageDeadline] = useState('')
 
-  const currentWeek = Math.ceil((new Date().getTime() - new Date(selectedGoal?.startDate || '').getTime()) / (7 * 24 * 60 * 60 * 1000)) || 1
+  const [milestoneWeek, setMilestoneWeek] = useState(1)
+  const [milestoneTitle, setMilestoneTitle] = useState('')
+  const [milestoneDesc, setMilestoneDesc] = useState('')
+
+  const [dailyTitle, setDailyTitle] = useState('')
+  const [dailyPriority, setDailyPriority] = useState<Priority>('medium')
+  const [dailyMinutes, setDailyMinutes] = useState(25)
+  const [dailyDate, setDailyDate] = useState(getToday())
+
+  useDidShow(async () => {
+    await refreshData()
+    if (activeGoals.length > 0 && !selectedGoalId) {
+      setSelectedGoalId(activeGoals[0].id)
+    }
+  })
+
+  const selectedGoal = useMemo(() => goals.find(g => g.id === selectedGoalId), [goals, selectedGoalId])
+
+  const currentWeek = useMemo(() => {
+    if (!selectedGoal) return 1
+    const diff = new Date().getTime() - new Date(selectedGoal.startDate).getTime()
+    return Math.ceil(diff / (7 * 24 * 60 * 60 * 1000)) || 1
+  }, [selectedGoal])
 
   const todayStr = getToday()
-  const todayActions = dailyActions.filter(
+  const todayActions = useMemo(() => dailyActions.filter(
     action => action.date === todayStr && action.goalId === selectedGoalId
-  )
+  ), [dailyActions, todayStr, selectedGoalId])
 
-  const handleToggleTask = (taskId: string) => {
-    setDailyActions(prev =>
-      prev.map(action =>
-        action.id === taskId
-          ? {
-              ...action,
-              status: action.status === 'completed' ? 'pending' : 'completed',
-              completedMinutes: action.status === 'completed' ? 0 : action.estimatedMinutes
-            }
-          : action
-      )
-    )
+  const handleToggleStage = (taskId: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'completed' ? 'pending' : 'completed'
+    updateStageTask(selectedGoalId, taskId, { status: newStatus as any })
   }
 
-  const handleAddStage = () => {
-    Taro.showToast({ title: '添加阶段任务', icon: 'none' })
+  const handleToggleMilestone = (milestoneId: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'completed' ? 'pending' : 'completed'
+    updateWeeklyMilestone(selectedGoalId, milestoneId, { status: newStatus as any })
   }
 
-  const handleAddMilestone = () => {
-    Taro.showToast({ title: '添加里程碑', icon: 'none' })
+  const resetAddForm = () => {
+    setStageTitle('')
+    setStageDesc('')
+    setStageDeadline('')
+    setMilestoneWeek(1)
+    setMilestoneTitle('')
+    setMilestoneDesc('')
+    setDailyTitle('')
+    setDailyPriority('medium')
+    setDailyMinutes(25)
+    setDailyDate(getToday())
   }
 
-  const handleAddDaily = () => {
-    Taro.showToast({ title: '添加每日行动', icon: 'none' })
+  const openAddModal = (type: 'stage' | 'milestone' | 'daily') => {
+    if (!selectedGoalId) {
+      Taro.showToast({ title: '请先选择目标', icon: 'none' })
+      return
+    }
+    setAddType(type)
+    resetAddForm()
+    setShowAddModal(true)
+  }
+
+  const handleSaveAdd = async () => {
+    if (addType === 'stage') {
+      if (!stageTitle.trim()) {
+        Taro.showToast({ title: '请输入任务标题', icon: 'none' })
+        return
+      }
+      if (!stageDeadline) {
+        Taro.showToast({ title: '请选择截止日期', icon: 'none' })
+        return
+      }
+      await addStageTask(selectedGoalId, {
+        title: stageTitle.trim(),
+        description: stageDesc.trim(),
+        deadline: stageDeadline,
+        order: selectedGoal?.stageTasks.length || 0
+      })
+    } else if (addType === 'milestone') {
+      if (!milestoneTitle.trim()) {
+        Taro.showToast({ title: '请输入里程碑标题', icon: 'none' })
+        return
+      }
+      await addWeeklyMilestone(selectedGoalId, {
+        weekNumber: milestoneWeek,
+        title: milestoneTitle.trim(),
+        description: milestoneDesc.trim()
+      })
+    } else if (addType === 'daily') {
+      if (!dailyTitle.trim()) {
+        Taro.showToast({ title: '请输入行动标题', icon: 'none' })
+        return
+      }
+      await addDailyAction({
+        date: dailyDate,
+        title: dailyTitle.trim(),
+        goalId: selectedGoalId,
+        priority: dailyPriority,
+        estimatedMinutes: dailyMinutes,
+        isTemporary: false
+      })
+    }
+
+    setShowAddModal(false)
+    resetAddForm()
+    Taro.showToast({ title: '添加成功', icon: 'success' })
   }
 
   const renderStages = () => {
@@ -68,6 +154,7 @@ const BreakdownPage: React.FC = () => {
           <View
             key={stage.id}
             className={classnames(styles.stageCard, styles[stage.status])}
+            onClick={() => handleToggleStage(stage.id, stage.status)}
           >
             <View className={styles.stageHeader}>
               <View className={styles.stageIndex}>{index + 1}</View>
@@ -112,6 +199,7 @@ const BreakdownPage: React.FC = () => {
               styles.milestoneItem,
               milestone.weekNumber === currentWeek && styles.current
             )}
+            onClick={() => handleToggleMilestone(milestone.id, milestone.status)}
           >
             <View
               className={classnames(
@@ -161,7 +249,7 @@ const BreakdownPage: React.FC = () => {
             <View
               key={action.id}
               className={styles.dailyTask}
-              onClick={() => handleToggleTask(action.id)}
+              onClick={() => toggleDailyAction(action.id)}
             >
               <View
                 className={classnames(
@@ -231,12 +319,14 @@ const BreakdownPage: React.FC = () => {
           </Text>
           <Text
             className={styles.sectionTip}
-            onClick={
-              viewType === 'stages'
-                ? handleAddStage
-                : viewType === 'milestones'
-                ? handleAddMilestone
-                : handleAddDaily
+            onClick={() =>
+              openAddModal(
+                viewType === 'stages'
+                  ? 'stage'
+                  : viewType === 'milestones'
+                  ? 'milestone'
+                  : 'daily'
+              )
             }
           >
             + 添加
@@ -247,6 +337,168 @@ const BreakdownPage: React.FC = () => {
         {viewType === 'milestones' && renderMilestones()}
         {viewType === 'daily' && renderDaily()}
       </ScrollView>
+
+      {showAddModal && (
+        <View className={styles.modalOverlay} onClick={() => setShowAddModal(false)}>
+          <View className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <View className={styles.modalHeader}>
+              <Text className={styles.modalTitle}>
+                {addType === 'stage' ? '添加阶段任务' : addType === 'milestone' ? '添加里程碑' : '添加每日行动'}
+              </Text>
+              <Text className={styles.modalClose} onClick={() => setShowAddModal(false)}>×</Text>
+            </View>
+
+            <ScrollView scrollY className={styles.modalBody}>
+              {addType === 'stage' && (
+                <>
+                  <View className={styles.formItem}>
+                    <Text className={styles.formLabel}>任务标题 <Text className={styles.required}>*</Text></Text>
+                    <Input
+                      className={styles.formInput}
+                      placeholder='例如：完成PMBOK第一章学习'
+                      value={stageTitle}
+                      onInput={(e) => setStageTitle(e.detail.value)}
+                      maxlength={50}
+                    />
+                  </View>
+                  <View className={styles.formItem}>
+                    <Text className={styles.formLabel}>任务描述</Text>
+                    <Textarea
+                      className={styles.formTextarea}
+                      placeholder='详细描述这个阶段任务...'
+                      value={stageDesc}
+                      onInput={(e) => setStageDesc(e.detail.value)}
+                      maxlength={200}
+                    />
+                  </View>
+                  <View className={styles.formItem}>
+                    <Text className={styles.formLabel}>截止日期 <Text className={styles.required}>*</Text></Text>
+                    <Picker
+                      mode='date'
+                      value={stageDeadline}
+                      onChange={(e) => setStageDeadline(e.detail.value)}
+                    >
+                      <View className={styles.formPicker}>
+                        <Text className={stageDeadline ? styles.pickerValue : styles.pickerPlaceholder}>
+                          {stageDeadline || '请选择截止日期'}
+                        </Text>
+                        <Text className={styles.pickerArrow}>›</Text>
+                      </View>
+                    </Picker>
+                  </View>
+                </>
+              )}
+
+              {addType === 'milestone' && (
+                <>
+                  <View className={styles.formItem}>
+                    <Text className={styles.formLabel}>周数 <Text className={styles.required}>*</Text></Text>
+                    <Picker
+                      mode='selector'
+                      range={Array.from({ length: 12 }, (_, i) => `第 ${i + 1} 周`)}
+                      value={milestoneWeek - 1}
+                      onChange={(e) => setMilestoneWeek(parseInt(e.detail.value) + 1)}
+                    >
+                      <View className={styles.formPicker}>
+                        <Text className={styles.pickerValue}>第 {milestoneWeek} 周</Text>
+                        <Text className={styles.pickerArrow}>›</Text>
+                      </View>
+                    </Picker>
+                  </View>
+                  <View className={styles.formItem}>
+                    <Text className={styles.formLabel}>里程碑标题 <Text className={styles.required}>*</Text></Text>
+                    <Input
+                      className={styles.formInput}
+                      placeholder='例如：完成范围管理学习'
+                      value={milestoneTitle}
+                      onInput={(e) => setMilestoneTitle(e.detail.value)}
+                      maxlength={50}
+                    />
+                  </View>
+                  <View className={styles.formItem}>
+                    <Text className={styles.formLabel}>描述</Text>
+                    <Textarea
+                      className={styles.formTextarea}
+                      placeholder='简单描述这个里程碑...'
+                      value={milestoneDesc}
+                      onInput={(e) => setMilestoneDesc(e.detail.value)}
+                      maxlength={200}
+                    />
+                  </View>
+                </>
+              )}
+
+              {addType === 'daily' && (
+                <>
+                  <View className={styles.formItem}>
+                    <Text className={styles.formLabel}>行动标题 <Text className={styles.required}>*</Text></Text>
+                    <Input
+                      className={styles.formInput}
+                      placeholder='例如：学习PMBOK第5章'
+                      value={dailyTitle}
+                      onInput={(e) => setDailyTitle(e.detail.value)}
+                      maxlength={50}
+                    />
+                  </View>
+                  <View className={styles.formItem}>
+                    <Text className={styles.formLabel}>日期</Text>
+                    <Picker
+                      mode='date'
+                      value={dailyDate}
+                      onChange={(e) => setDailyDate(e.detail.value)}
+                    >
+                      <View className={styles.formPicker}>
+                        <Text className={styles.pickerValue}>{dailyDate}</Text>
+                        <Text className={styles.pickerArrow}>›</Text>
+                      </View>
+                    </Picker>
+                  </View>
+                  <View className={styles.formItem}>
+                    <Text className={styles.formLabel}>优先级</Text>
+                    <View className={styles.priorityRow}>
+                      {priorities.map((p, i) => (
+                        <Button
+                          key={p.value}
+                          className={classnames(
+                            styles.priorityBtn,
+                            dailyPriority === p.value && styles.priorityBtnActive
+                          )}
+                          onClick={() => setDailyPriority(p.value)}
+                        >
+                          {p.label}
+                        </Button>
+                      ))}
+                    </View>
+                  </View>
+                  <View className={styles.formItem}>
+                    <Text className={styles.formLabel}>预估时间（分钟）</Text>
+                    <Picker
+                      mode='selector'
+                      range={[15, 25, 30, 50, 60, 75, 90, 120]}
+                      value={[15, 25, 30, 50, 60, 75, 90, 120].indexOf(dailyMinutes)}
+                      onChange={(e) => setDailyMinutes([15, 25, 30, 50, 60, 75, 90, 120][parseInt(e.detail.value)])}
+                    >
+                      <View className={styles.formPicker}>
+                        <Text className={styles.pickerValue}>{dailyMinutes} 分钟</Text>
+                        <Text className={styles.pickerArrow}>›</Text>
+                      </View>
+                    </Picker>
+                  </View>
+                </>
+              )}
+            </ScrollView>
+
+            <View className={styles.modalFooter}>
+              <Button className={styles.cancelBtn} onClick={() => setShowAddModal(false)}>
+                取消
+              </Button>
+              <Button className={styles.confirmBtn} onClick={handleSaveAdd}>
+                保存
+              </Button>
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   )
 }

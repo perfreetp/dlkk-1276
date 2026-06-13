@@ -339,3 +339,212 @@
   color: $color-text-white;
   font-size: $font-size-sm;
 }
+
+.batchHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $page-padding;
+  background: $color-primary-bg;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.batchInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.selectAllText {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.batchCount {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.cancelBatch {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.taskWrapper {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-xs 0;
+
+  &:not(:last-child) {
+    border-bottom: 1rpx solid $color-divider;
+  }
+}
+
+.batchConfirmBtn {
+  flex: 1;
+  @include button-reset;
+  height: 80rpx;
+  border-radius: $radius-button;
+  background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  width: 90%;
+  max-height: 80vh;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg $spacing-xl;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.modalTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.modalClose {
+  font-size: 48rpx;
+  color: $color-text-tertiary;
+  line-height: 1;
+  padding: 0 $spacing-sm;
+}
+
+.modalBody {
+  padding: $spacing-lg $spacing-xl;
+}
+
+.modalFooter {
+  display: flex;
+  gap: $spacing-md;
+  padding: $spacing-lg $spacing-xl;
+  border-top: 1rpx solid $color-divider;
+}
+
+.formItem {
+  margin-bottom: $spacing-lg;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.formLabel {
+  display: block;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.required {
+  color: $color-error;
+  margin-left: 4rpx;
+}
+
+.formInput {
+  width: 100%;
+  height: 88rpx;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  background-color: $color-bg-input;
+  border-radius: $radius-md;
+  padding: 0 $spacing-md;
+  box-sizing: border-box;
+}
+
+.formPicker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 88rpx;
+  background-color: $color-bg-input;
+  border-radius: $radius-md;
+  padding: 0 $spacing-md;
+}
+
+.pickerValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.pickerArrow {
+  font-size: 36rpx;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-light;
+}
+
+.priorityRow {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.priorityBtn {
+  flex: 1;
+  height: 72rpx;
+  font-size: $font-size-sm;
+  border-radius: $radius-md;
+  border: 2rpx solid $color-border;
+  background-color: $color-bg-card;
+  color: $color-text-secondary;
+  margin: 0;
+
+  &.priorityBtnActive {
+    border-color: $color-primary;
+    background-color: $color-primary-bg;
+    color: $color-primary;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.cancelBtn {
+  flex: 1;
+  height: 88rpx;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  background-color: $color-bg-hover;
+  border-radius: $radius-button;
+  margin: 0;
+}
+
+.confirmBtn {
+  flex: 2;
+  height: 88rpx;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+  background: linear-gradient(135deg, $color-primary, $color-secondary);
+  border-radius: $radius-button;
+  margin: 0;
+}

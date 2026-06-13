@@ -1,37 +1,84 @@
-import React, { useState } from 'react'
-import { View, Text, Button, ScrollView } from '@tarojs/components'
-import Taro from '@tarojs/taro'
+import React, { useState, useMemo } from 'react'
+import { View, Text, Button, ScrollView, Canvas, Image } from '@tarojs/components'
+import Taro, { useDidShow } from '@tarojs/taro'
 import styles from './index.module.scss'
 import classnames from 'classnames'
-import { mockWeeklyReviews } from '@/data/mockData'
+import { useGoalContext } from '@/store/GoalContext'
+import { generateReviewImage, saveImageToAlbum, previewImage } from '@/utils/exportImage'
 import type { WeeklyReview } from '@/types/goal'
 
 type FilterType = 'all' | 'completed' | 'draft'
 
 const ReviewPage: React.FC = () => {
-  const [reviews, setReviews] = useState<WeeklyReview[]>(mockWeeklyReviews)
+  const { reviews, refreshData } = useGoalContext()
   const [filter, setFilter] = useState<FilterType>('all')
+  const [exporting, setExporting] = useState(false)
+  const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null)
+  const [currentExportReview, setCurrentExportReview] = useState<WeeklyReview | null>(null)
 
-  const filteredReviews = reviews.filter(r => {
+  useDidShow(async () => {
+    await refreshData()
+  })
+
+  const filteredReviews = useMemo(() => reviews.filter(r => {
     if (filter === 'all') return true
     if (filter === 'completed') return true
     return false
-  })
+  }), [reviews, filter])
 
   const completedCount = reviews.length
 
   const handleCreateReview = () => {
-    Taro.showToast({ title: '创建本周复盘', icon: 'none' })
-    console.log('[Review] 创建新复盘')
+    Taro.navigateTo({ url: '/pages/create-review/index' })
   }
 
   const handleViewDetail = (review: WeeklyReview) => {
     console.log('[Review] 查看复盘详情:', review.weekNumber)
   }
 
-  const handleExportImage = (review: WeeklyReview) => {
-    Taro.showToast({ title: '导出复盘长图', icon: 'none' })
-    console.log('[Review] 导出复盘长图:', review.weekNumber)
+  const handleExportImage = async (review: WeeklyReview) => {
+    setCurrentExportReview(review)
+    setExporting(true)
+    Taro.showLoading({ title: '生成图片中...' })
+
+    try {
+      setTimeout(async () => {
+        try {
+          const imagePath = await generateReviewImage(review)
+          setPreviewImageUrl(imagePath)
+          Taro.hideLoading()
+        } catch (error) {
+          console.error('[Review] 生成图片失败:', error)
+          Taro.hideLoading()
+          Taro.showToast({ title: '生成失败，请重试', icon: 'none' })
+        } finally {
+          setExporting(false)
+          setCurrentExportReview(null)
+        }
+      }, 300)
+    } catch (error) {
+      console.error('[Review] 导出失败:', error)
+      Taro.hideLoading()
+      setExporting(false)
+      setCurrentExportReview(null)
+      Taro.showToast({ title: '导出失败，请重试', icon: 'none' })
+    }
+  }
+
+  const handleSaveImage = async () => {
+    if (previewImageUrl) {
+      await saveImageToAlbum(previewImageUrl)
+    }
+  }
+
+  const handlePreviewImage = () => {
+    if (previewImageUrl) {
+      previewImage(previewImageUrl)
+    }
+  }
+
+  const handleClosePreview = () => {
+    setPreviewImageUrl(null)
   }
 
   const handleShare = (review: WeeklyReview) => {
@@ -187,6 +234,41 @@ const ReviewPage: React.FC = () => {
       <Button className={styles.fabButton} onClick={handleCreateReview}>
         +
       </Button>
+
+      <View className={styles.hiddenCanvas}>
+        <Canvas
+          id='reviewExportCanvas'
+          type='2d'
+          style={{ width: '750px', height: '2000px' }}
+        />
+      </View>
+
+      {previewImageUrl && (
+        <View className={styles.previewModal} onClick={handleClosePreview}>
+          <View className={styles.previewContent} onClick={(e) => e.stopPropagation()}>
+            <View className={styles.previewHeader}>
+              <Text className={styles.previewTitle}>复盘长图预览</Text>
+              <Text className={styles.previewClose} onClick={handleClosePreview}>×</Text>
+            </View>
+            <ScrollView scrollY className={styles.previewScroll}>
+              <Image
+                src={previewImageUrl}
+                mode='widthFix'
+                className={styles.previewImage}
+                onClick={handlePreviewImage}
+              />
+            </ScrollView>
+            <View className={styles.previewFooter}>
+              <Button className={styles.previewBtn} onClick={handlePreviewImage}>
+                👁️ 查看大图
+              </Button>
+              <Button className={styles.previewBtnPrimary} onClick={handleSaveImage}>
+                💾 保存到相册
+              </Button>
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   )
 }

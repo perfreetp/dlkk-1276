@@ -1,0 +1,238 @@
+@use '@/styles/theme.scss' as *;
+
+.pageContainer {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: 100px;
+}
+
+.header {
+  background: linear-gradient(135deg, $color-primary, $color-secondary);
+  padding: 20px 16px 24px;
+  color: $color-text-white;
+}
+
+.weekInfo {
+  margin-bottom: 12px;
+}
+
+.weekTitle {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.weekDate {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.goalsSummary {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: inline-block;
+}
+
+.summaryLabel {
+  font-size: 13px;
+}
+
+.content {
+  height: calc(100vh - 180px);
+  padding: 16px 0;
+}
+
+.formSection {
+  background-color: $color-bg-card;
+  margin: 0 16px 16px;
+  border-radius: 16px;
+  padding: 8px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.formItem {
+  padding: 16px 20px;
+  border-bottom: 1px solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.label {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: $color-text-primary;
+  margin-bottom: 12px;
+}
+
+.required {
+  color: $color-error;
+  margin-left: 4px;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 100px;
+  font-size: 15px;
+  color: $color-text-primary;
+  background-color: $color-bg-input;
+  border-radius: 10px;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  line-height: 1.6;
+}
+
+.sectionTitle {
+  display: block;
+  padding: 16px 20px 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: $color-text-primary;
+}
+
+.highlightsList {
+  margin-bottom: 12px;
+}
+
+.highlightItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: $color-primary-bg;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.highlightText {
+  font-size: 14px;
+  color: $color-text-primary;
+  flex: 1;
+}
+
+.highlightRemove {
+  font-size: 20px;
+  color: $color-text-tertiary;
+  padding: 0 8px;
+  line-height: 1;
+}
+
+.addHighlightRow {
+  display: flex;
+  gap: 8px;
+}
+
+.highlightInput {
+  flex: 1;
+  height: 40px;
+  font-size: 14px;
+  color: $color-text-primary;
+  background-color: $color-bg-input;
+  border-radius: 8px;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+
+.addHighlightBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, $color-primary, $color-secondary);
+  color: $color-text-white;
+  font-size: 20px;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.goalProgressItem {
+  padding: 12px 20px;
+  border-bottom: 1px solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.goalProgressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.goalProgressTitle {
+  font-size: 14px;
+  color: $color-text-primary;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 12px;
+}
+
+.goalProgressValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: $color-primary;
+}
+
+.goalProgressBar {
+  height: 6px;
+  background-color: $color-bg-input;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.goalProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, $color-primary, $color-secondary);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.goalProgressDetail {
+  font-size: 12px;
+  color: $color-text-tertiary;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background-color: $color-bg-card;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.cancelBtn {
+  flex: 1;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+  color: $color-text-secondary;
+  background-color: $color-bg-input;
+  border-radius: 12px;
+  margin: 0;
+}
+
+.submitBtn {
+  flex: 2;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 600;
+  color: $color-text-white;
+  background: linear-gradient(135deg, $color-primary, $color-secondary);
+  border-radius: 12px;
+  margin: 0;
+}

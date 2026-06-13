@@ -1,29 +1,34 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { View, Text, Button, ScrollView } from '@tarojs/components'
-import Taro from '@tarojs/taro'
+import Taro, { useDidShow } from '@tarojs/taro'
 import styles from './index.module.scss'
 import classnames from 'classnames'
 import GoalCard from '@/components/GoalCard'
-import { mockGoals, goalTemplates } from '@/data/mockData'
+import { goalTemplates } from '@/data/mockData'
+import { useGoalContext } from '@/store/GoalContext'
 import type { Goal } from '@/types/goal'
 
 type FilterType = 'all' | 'active' | 'completed' | 'archived'
 
 const GoalBoardPage: React.FC = () => {
   const [filter, setFilter] = useState<FilterType>('active')
-  const [goals, setGoals] = useState<Goal[]>(mockGoals)
+  const { goals, refreshData, loading } = useGoalContext()
 
-  const filteredGoals = goals.filter(goal => {
-    if (filter === 'all') return true
-    return goal.status === filter
+  useDidShow(async () => {
+    await refreshData()
   })
 
-  const activeGoals = goals.filter(g => g.status === 'active')
-  const completedGoals = goals.filter(g => g.status === 'completed')
-  const archivedGoals = goals.filter(g => g.status === 'archived')
+  const filteredGoals = useMemo(() => goals.filter(goal => {
+    if (filter === 'all') return true
+    return goal.status === filter
+  }), [goals, filter])
+
+  const activeGoals = useMemo(() => goals.filter(g => g.status === 'active'), [goals])
+  const completedGoals = useMemo(() => goals.filter(g => g.status === 'completed'), [goals])
+  const archivedGoals = useMemo(() => goals.filter(g => g.status === 'archived'), [goals])
 
   const handleCreateGoal = () => {
-    Taro.showToast({ title: '创建目标功能', icon: 'none' })
+    Taro.navigateTo({ url: '/pages/create-goal/index' })
   }
 
   const handleTemplateClick = (template: typeof goalTemplates[0]) => {
@@ -31,11 +36,11 @@ const GoalBoardPage: React.FC = () => {
   }
 
   const handleGoalClick = (goal: Goal) => {
-    console.log('[GoalBoard] 点击目标:', goal.title)
+    Taro.navigateTo({ url: `/pages/goal-detail/index?id=${goal.id}` })
   }
 
   const handleArchive = () => {
-    Taro.showToast({ title: '归档功能开发中', icon: 'none' })
+    setFilter('archived')
   }
 
   const handleShare = () => {

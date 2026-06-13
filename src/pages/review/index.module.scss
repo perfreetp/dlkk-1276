@@ -362,3 +362,97 @@
     line-height: $line-height-tight;
   }
 }
+
+.hiddenCanvas {
+  position: fixed;
+  left: -9999rpx;
+  top: -9999rpx;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.previewModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: $spacing-lg;
+}
+
+.previewContent {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.previewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1rpx solid $color-divider;
+  flex-shrink: 0;
+}
+
+.previewTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.previewClose {
+  font-size: 48rpx;
+  color: $color-text-tertiary;
+  line-height: 1;
+  padding: 0 $spacing-xs;
+}
+
+.previewScroll {
+  flex: 1;
+  min-height: 0;
+}
+
+.previewImage {
+  width: 100%;
+  display: block;
+}
+
+.previewFooter {
+  display: flex;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-lg;
+  border-top: 1rpx solid $color-divider;
+  flex-shrink: 0;
+}
+
+.previewBtn {
+  @include button-reset;
+  flex: 1;
+  height: 80rpx;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  background: $color-bg-hover;
+  color: $color-text-secondary;
+}
+
+.previewBtnPrimary {
+  @include button-reset;
+  flex: 1;
+  height: 80rpx;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  background: linear-gradient(135deg, $color-secondary 0%, $color-primary 100%);
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}

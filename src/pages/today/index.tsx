@@ -1,27 +1,43 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { View, Text, Button, ScrollView } from '@tarojs/components'
-import Taro from '@tarojs/taro'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
+import { View, Text, Button, ScrollView, Input, Picker, Checkbox } from '@tarojs/components'
+import Taro, { useDidShow } from '@tarojs/taro'
 import styles from './index.module.scss'
 import classnames from 'classnames'
 import TaskItem from '@/components/TaskItem'
-import { mockDailyActions, mockGoals } from '@/data/mockData'
-import type { DailyAction } from '@/types/goal'
-import { getToday, formatDate, formatMinutes } from '@/utils/dateUtil'
+import { useGoalContext } from '@/store/GoalContext'
+import type { DailyAction, Priority } from '@/types/goal'
+import { getToday, formatMinutes } from '@/utils/dateUtil'
+
+const priorities: { value: Priority; label: string }[] = [
+  { value: 'high', label: '高' },
+  { value: 'medium', label: '中' },
+  { value: 'low', label: '低' }
+]
 
 const TodayPage: React.FC = () => {
-  const [tasks, setTasks] = useState<DailyAction[]>([])
+  const { dailyActions, goals, refreshData, toggleDailyAction, delayDailyAction, batchCompleteActions, addDailyAction } = useGoalContext()
+
   const [pomodoroTime, setPomodoroTime] = useState(25 * 60)
   const [isTimerRunning, setIsTimerRunning] = useState(false)
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
   const [todayFocusMinutes, setTodayFocusMinutes] = useState(110)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [addTitle, setAddTitle] = useState('')
+  const [addPriority, setAddPriority] = useState<Priority>('medium')
+  const [addMinutes, setAddMinutes] = useState(25)
+
+  const [showBatchMode, setShowBatchMode] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+
   const todayStr = getToday()
 
-  useEffect(() => {
-    const todayTasks = mockDailyActions.filter(t => t.date === todayStr)
-    setTasks(todayTasks)
-  }, [todayStr])
+  useDidShow(async () => {
+    await refreshData()
+  })
+
+  const tasks = useMemo(() => dailyActions.filter(t => t.date === todayStr), [dailyActions, todayStr])
 
   useEffect(() => {
     if (isTimerRunning) {
@@ -72,19 +88,7 @@ const TodayPage: React.FC = () => {
   }
 
   const handleToggleTask = (taskId: string) => {
-    setTasks(prev =>
-      prev.map(task => {
-        if (task.id === taskId) {
-          const newStatus = task.status === 'completed' ? 'pending' : 'completed'
-          return {
-            ...task,
-            status: newStatus,
-            completedMinutes: newStatus === 'completed' ? task.estimatedMinutes : 0
-          }
-        }
-        return task
-      })
-    )
+    toggleDailyAction(taskId)
   }
 
   const handleDelayTask = (taskId: string) => {
@@ -93,16 +97,9 @@ const TodayPage: React.FC = () => {
       content: '请输入延期原因',
       editable: true,
       placeholderText: '请输入延期原因...',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm && res.content) {
-          setTasks(prev =>
-            prev.map(task =>
-              task.id === taskId
-                ? { ...task, status: 'delayed', delayReason: res.content }
-                : task
-            )
-          )
-          console.log('[Today] 任务已延期:', taskId, '原因:', res.content)
+          await delayDailyAction(taskId, res.content)
         }
       }
     })
@@ -118,17 +115,38 @@ const TodayPage: React.FC = () => {
 
   const handleAddTask = () => {
     Taro.showActionSheet({
-      itemList: ['添加临时事项', '从目标中选择', '从模板添加'],
+      itemList: ['添加临时事项', '从目标中选择'],
       success: (res) => {
         if (res.tapIndex === 0) {
-          Taro.showToast({ title: '添加临时事项', icon: 'none' })
+          setAddTitle('')
+          setAddPriority('medium')
+          setAddMinutes(25)
+          setShowAddModal(true)
         } else if (res.tapIndex === 1) {
-          Taro.showToast({ title: '从目标中选择', icon: 'none' })
-        } else {
-          Taro.showToast({ title: '从模板添加', icon: 'none' })
+          Taro.showToast({ title: '请在拆解计划中添加', icon: 'none' })
         }
       }
     })
+  }
+
+  const handleSaveTemporary = async () => {
+    if (!addTitle.trim()) {
+      Taro.showToast({ title: '请输入事项内容', icon: 'none' })
+      return
+    }
+
+    await addDailyAction({
+      date: todayStr,
+      title: addTitle.trim(),
+      goalId: 'temporary',
+      priority: addPriority,
+      estimatedMinutes: addMinutes,
+      isTemporary: true
+    })
+
+    setShowAddModal(false)
+    setAddTitle('')
+    Taro.showToast({ title: '添加成功', icon: 'success' })
   }
 
   const handleQuickPlan = () => {
@@ -136,7 +154,41 @@ const TodayPage: React.FC = () => {
   }
 
   const handleBatchComplete = () => {
-    Taro.showToast({ title: '批量完成功能', icon: 'none' })
+    if (showBatchMode) {
+      if (selectedIds.length === 0) {
+        Taro.showToast({ title: '请先选择任务', icon: 'none' })
+        return
+      }
+      batchCompleteActions(selectedIds)
+      setSelectedIds([])
+      setShowBatchMode(false)
+    } else {
+      setShowBatchMode(true)
+      setSelectedIds([])
+    }
+  }
+
+  const handleCancelBatch = () => {
+    setShowBatchMode(false)
+    setSelectedIds([])
+  }
+
+  const toggleSelectTask = (taskId: string) => {
+    setSelectedIds(prev =>
+      prev.includes(taskId)
+        ? prev.filter(id => id !== taskId)
+        : [...prev, taskId]
+    )
+  }
+
+  const selectAllPending = () => {
+    const pendingIds = pendingTasks.map(t => t.id)
+    const allSelected = pendingIds.every(id => selectedIds.includes(id))
+    if (allSelected) {
+      setSelectedIds([])
+    } else {
+      setSelectedIds(pendingIds)
+    }
   }
 
   const completedTasks = tasks.filter(t => t.status === 'completed')
@@ -225,6 +277,23 @@ const TodayPage: React.FC = () => {
         </View>
       </View>
 
+      {showBatchMode && (
+        <View className={styles.batchHeader}>
+          <View className={styles.batchInfo}>
+            <Text
+              className={styles.selectAllText}
+              onClick={selectAllPending}
+            >
+              全选待完成
+            </Text>
+            <Text className={styles.batchCount}>已选择 {selectedIds.length} 项</Text>
+          </View>
+          <Text className={styles.cancelBatch} onClick={handleCancelBatch}>
+            取消
+          </Text>
+        </View>
+      )}
+
       <ScrollView scrollY className={styles.tasksSection}>
         {pendingTasks.length > 0 && (
           <View>
@@ -233,13 +302,21 @@ const TodayPage: React.FC = () => {
             </View>
             <View className={styles.tasksList}>
               {pendingTasks.map(task => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onToggle={handleToggleTask}
-                  onDelay={handleDelayTask}
-                  onStartPomodoro={handleStartPomodoro}
-                />
+                <View key={task.id} className={styles.taskWrapper}>
+                  {showBatchMode && (
+                    <Checkbox
+                      checked={selectedIds.includes(task.id)}
+                      onChange={() => toggleSelectTask(task.id)}
+                      color='#5B8DEF'
+                    />
+                  )}
+                  <TaskItem
+                    task={task}
+                    onToggle={showBatchMode ? () => toggleSelectTask(task.id) : handleToggleTask}
+                    onDelay={handleDelayTask}
+                    onStartPomodoro={handleStartPomodoro}
+                  />
+                </View>
               ))}
             </View>
           </View>
@@ -252,12 +329,20 @@ const TodayPage: React.FC = () => {
             </View>
             <View className={styles.tasksList}>
               {delayedTasks.map(task => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onToggle={handleToggleTask}
-                  onStartPomodoro={handleStartPomodoro}
-                />
+                <View key={task.id} className={styles.taskWrapper}>
+                  {showBatchMode && (
+                    <Checkbox
+                      checked={selectedIds.includes(task.id)}
+                      onChange={() => toggleSelectTask(task.id)}
+                      color='#5B8DEF'
+                    />
+                  )}
+                  <TaskItem
+                    task={task}
+                    onToggle={showBatchMode ? () => toggleSelectTask(task.id) : handleToggleTask}
+                    onStartPomodoro={handleStartPomodoro}
+                  />
+                </View>
               ))}
             </View>
           </View>
@@ -270,11 +355,19 @@ const TodayPage: React.FC = () => {
             </View>
             <View className={styles.tasksList}>
               {completedTasks.map(task => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onToggle={handleToggleTask}
-                />
+                <View key={task.id} className={styles.taskWrapper}>
+                  {showBatchMode && (
+                    <Checkbox
+                      checked={selectedIds.includes(task.id)}
+                      onChange={() => toggleSelectTask(task.id)}
+                      color='#5B8DEF'
+                    />
+                  )}
+                  <TaskItem
+                    task={task}
+                    onToggle={showBatchMode ? () => toggleSelectTask(task.id) : handleToggleTask}
+                  />
+                </View>
               ))}
             </View>
           </View>
@@ -291,18 +384,95 @@ const TodayPage: React.FC = () => {
         )}
       </ScrollView>
 
-      <Button className={styles.addFAB} onClick={handleAddTask}>
-        +
-      </Button>
+      {!showBatchMode && (
+        <Button className={styles.addFAB} onClick={handleAddTask}>
+          +
+        </Button>
+      )}
 
       <View className={styles.bottomBar}>
-        <Button className={styles.quickAction} onClick={handleQuickPlan}>
-          📋 快速规划
-        </Button>
-        <Button className={styles.primaryAction} onClick={handleBatchComplete}>
-          ✓ 批量完成
-        </Button>
+        {showBatchMode ? (
+          <Button
+            className={styles.batchConfirmBtn}
+            onClick={handleBatchComplete}
+          >
+            ✓ 批量完成 ({selectedIds.length})
+          </Button>
+        ) : (
+          <>
+            <Button className={styles.quickAction} onClick={handleQuickPlan}>
+              📋 快速规划
+            </Button>
+            <Button className={styles.primaryAction} onClick={handleBatchComplete}>
+              ✓ 批量完成
+            </Button>
+          </>
+        )}
       </View>
+
+      {showAddModal && (
+        <View className={styles.modalOverlay} onClick={() => setShowAddModal(false)}>
+          <View className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <View className={styles.modalHeader}>
+              <Text className={styles.modalTitle}>添加临时事项</Text>
+              <Text className={styles.modalClose} onClick={() => setShowAddModal(false)}>×</Text>
+            </View>
+
+            <View className={styles.modalBody}>
+              <View className={styles.formItem}>
+                <Text className={styles.formLabel}>事项内容 <Text className={styles.required}>*</Text></Text>
+                <Input
+                  className={styles.formInput}
+                  placeholder='例如：回复邮件、打电话...'
+                  value={addTitle}
+                  onInput={(e) => setAddTitle(e.detail.value)}
+                  maxlength={50}
+                />
+              </View>
+              <View className={styles.formItem}>
+                <Text className={styles.formLabel}>优先级</Text>
+                <View className={styles.priorityRow}>
+                  {priorities.map((p, i) => (
+                    <Button
+                      key={p.value}
+                      className={classnames(
+                        styles.priorityBtn,
+                        addPriority === p.value && styles.priorityBtnActive
+                      )}
+                      onClick={() => setAddPriority(p.value)}
+                    >
+                      {p.label}
+                    </Button>
+                  ))}
+                </View>
+              </View>
+              <View className={styles.formItem}>
+                <Text className={styles.formLabel}>预估时间（分钟）</Text>
+                <Picker
+                  mode='selector'
+                  range={[15, 25, 30, 50, 60, 75, 90, 120]}
+                  value={[15, 25, 30, 50, 60, 75, 90, 120].indexOf(addMinutes)}
+                  onChange={(e) => setAddMinutes([15, 25, 30, 50, 60, 75, 90, 120][parseInt(e.detail.value)])}
+                >
+                  <View className={styles.formPicker}>
+                    <Text className={styles.pickerValue}>{addMinutes} 分钟</Text>
+                    <Text className={styles.pickerArrow}>›</Text>
+                  </View>
+                </Picker>
+              </View>
+            </View>
+
+            <View className={styles.modalFooter}>
+              <Button className={styles.cancelBtn} onClick={() => setShowAddModal(false)}>
+                取消
+              </Button>
+              <Button className={styles.confirmBtn} onClick={handleSaveTemporary}>
+                保存
+              </Button>
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   )
 }

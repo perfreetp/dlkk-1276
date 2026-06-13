@@ -1,15 +1,20 @@
-import React, { useState } from 'react'
+import React, { useMemo } from 'react'
 import { View, Text, Button, ScrollView } from '@tarojs/components'
-import Taro from '@tarojs/taro'
+import Taro, { useDidShow } from '@tarojs/taro'
 import styles from './index.module.scss'
 import classnames from 'classnames'
-import { mockGoals, mockStats } from '@/data/mockData'
+import { useGoalContext } from '@/store/GoalContext'
 import type { Goal } from '@/types/goal'
 import { formatMinutes } from '@/utils/dateUtil'
 
 const StatsPage: React.FC = () => {
-  const [goals] = useState<Goal[]>(mockGoals)
-  const stats = mockStats
+  const { goals, reviews, pomodoroSessions, refreshData, calculateStats } = useGoalContext()
+
+  useDidShow(async () => {
+    await refreshData()
+  })
+
+  const stats = useMemo(() => calculateStats(), [goals, reviews, pomodoroSessions])
 
   const weekDays = ['一', '二', '三', '四', '五', '六', '日']
   const weekFocusMinutes = [60, 90, 75, 120, 85, 110, 0]
@@ -30,6 +35,8 @@ const StatsPage: React.FC = () => {
   }
 
   const activeGoals = goals.filter(g => g.status === 'active')
+  const archivedGoals = goals.filter(g => g.status === 'archived')
+  const completedPomodoros = pomodoroSessions.filter(p => p.completed).length
 
   return (
     <ScrollView scrollY className={styles.pageContainer}>
@@ -182,21 +189,21 @@ const StatsPage: React.FC = () => {
         <View className={styles.moreStatCard}>
           <View className={classnames(styles.moreStatIcon, styles.primary)}>📝</View>
           <View className={styles.moreStatInfo}>
-            <View className={styles.moreStatValue}>3</View>
+            <View className={styles.moreStatValue}>{reviews.length}</View>
             <View className={styles.moreStatLabel}>已完成复盘</View>
           </View>
         </View>
         <View className={styles.moreStatCard}>
           <View className={classnames(styles.moreStatIcon, styles.success)}>🍅</View>
           <View className={styles.moreStatInfo}>
-            <View className={styles.moreStatValue}>182</View>
+            <View className={styles.moreStatValue}>{completedPomodoros}</View>
             <View className={styles.moreStatLabel}>完成番茄</View>
           </View>
         </View>
         <View className={styles.moreStatCard}>
           <View className={classnames(styles.moreStatIcon, styles.secondary)}>📁</View>
           <View className={styles.moreStatInfo}>
-            <View className={styles.moreStatValue}>0</View>
+            <View className={styles.moreStatValue}>{archivedGoals.length}</View>
             <View className={styles.moreStatLabel}>已归档</View>
           </View>
         </View>
